@@ -1,0 +1,1 @@
+{"weather":1,"temperature":0,"windSpeed":0,"windDirection":0}
