@@ -173,15 +173,50 @@ export function updateStats(player, vehicle, object) {
     }
 }
 
-export function spawnVehicle(player, vehicleName, vehiclePedIn) {
-    //need modification~
+export async function spawnVehicle(player, vehicleName, vehiclePedIn) {
+    
+    //If vehicle has already a owner will not destroy 
     if(vehiclePedIn !== undefined && vehiclePedIn.ownerid === undefined) {
         vehiclePedIn.destroy();
     }
+
     const vehicle = new alt.Vehicle(vehicleName, player.pos.x + 1, player.pos.y + 1, player.pos.z + 1, 0, 0, 0);
-    vehicle.loadVehicle(null, vehicle, false);
-    alt.emitClient(player, 'vehicle:spawnCompleted', vehicle.object);
-    player.notify('Veiculo: <b>"' + vehicleName + '"</b> spawn com sucesso !', 20, 255, 20);
+    
+    const carPosition = {
+        x: vehicle.pos.x,
+        y: vehicle.pos.y,
+        z: vehicle.pos.z,
+
+        rotx: vehicle.rot.x,
+        roty: vehicle.rot.y,
+        rotz: vehicle.rot.z
+    };
+
+    const def_carInfo = {
+        id: player.charid,
+        ownerID: player.charid,
+        plate: "SPWCAR",
+        key_code: null,
+        kilometers: 0,
+        fuelType: 0,
+        fuelConsumption: 10,
+        fuel: 50,
+        brakeOil: 10,
+        engineOil: 20,
+        engineWater: 20,
+        engineBroke: 20,
+        
+    };
+
+    vehicle.loadVehicle(JSON.stringify(def_carInfo), vehicle, false);
+    
+    await mysql.query("INSERT INTO vehicles (ownerID, model, location, status, info) VALUES ('" + player.ownerid + "', '" + vehicleName + "', '" + JSON.stringify(carPosition) + "', '" + JSON.stringify(getVehicleCondition(vehicle)) + "', '" + JSON.stringify(def_carInfo) + "')").then(([result, fields]) => {
+        player.notify('Veiculo: <b>"' + vehicleName + '"</b> spawn com sucesso !', 20, 255, 20);
+    }).catch((err) => {
+        vehicle.destroy();
+        logger.database(err);
+        player.notify('Veiculo: <b>"' + vehicleName + '"</b> não foi spawn devido : ' + err + ' !', 255, 20, 20);
+    })
 }
 
 //INITIALIZE ALL SERVER VEHICLES
@@ -196,7 +231,7 @@ export async function initializeServerVehicles() {
             let vehicle = new alt.Vehicle(result[i].model, position.x, position.y, position.z, position.rotx, position.roty, position.rotz);
       
             //Loads vehicle extends info
-            vehicle.loadVehicle(result[i], vehicle)
+            vehicle.loadVehicle(result[i].info, vehicle)
             //Loads vehicle condition based on database
             setVehicleCondition(vehicle, status)
             //Set a interval for each car
@@ -215,15 +250,6 @@ export async function initializeServerVehicles() {
 }
 
 export async function saveVehicle(vehicle) {
-    const carPosition = {
-        x: vehicle.pos.x,
-        y: vehicle.pos.y,
-        z: vehicle.pos.z,
-
-        rotx: vehicle.rot.x,
-        roty: vehicle.rot.y,
-        rotz: vehicle.rot.z
-    };
 
     const carInfo = {
         plate: vehicle.plate,
@@ -239,6 +265,17 @@ export async function saveVehicle(vehicle) {
         engineBroke: vehicle.engineBroke
         
     };
+
+    const carPosition = {
+        x: vehicle.pos.x,
+        y: vehicle.pos.y,
+        z: vehicle.pos.z,
+
+        rotx: vehicle.rot.x,
+        roty: vehicle.rot.y,
+        rotz: vehicle.rot.z
+    };
+
     await mysql.query("UPDATE vehicles SET location = '" + JSON.stringify(carPosition) + "', status = '" + JSON.stringify(getVehicleCondition(vehicle)) + "', info = '" + JSON.stringify(carInfo) + "' WHERE id = '" + vehicle.identifier + "'").then(([result, fields]) => {
         alt.log("Veiculo: " + targetVehicle.model + " guardado !")
     }).catch((err) => {

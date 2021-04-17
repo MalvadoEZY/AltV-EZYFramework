@@ -3,27 +3,27 @@ import * as alt from 'alt'
 alt.Vehicle.prototype.loadVehicle = function loadVehicle(result, vehicle, IntervalSavable = true) {
     this.object = vehicle;
     this.IntervalSavable = IntervalSavable;
-    if(result === null) {
-        this.numberPlateText = 'STAFF';
-    } else {
-        const vehicleInfo = JSON.parse(result.info);
+    if(result === null) return;
+    
+    // Will set all vehicle main variables to be able to use in the future
+    const vehicleInfo = JSON.parse(result);
 
-        this.identifier = result.id;
-        this.ownerid = result.ownerID;
-        this.plate = vehicleInfo.plate;
-        this.numberPlateText = this.plate;
-        this.key_code = vehicleInfo.key_code;
-        this.kilometers = vehicleInfo.kilometers;
-        //FUEL
-        this.fuelType = vehicleInfo.fuelType;
-        this.fuelConsumption = vehicleInfo.fuelConsumption;
-        this.fuel = vehicleInfo.fuel;
-        //MISC
-        this.brakeOil = vehicleInfo.brakeOil;
-        this.engineOil = vehicleInfo.engineOil;
-        this.engineWater = vehicleInfo.engineWater;
-        this.engineBroke = vehicleInfo.engineBroke;
-    }
+    this.identifier = result.id;
+    this.ownerid = result.ownerID;
+    this.plate = vehicleInfo.plate;
+    this.numberPlateText = this.plate;
+    this.key_code = vehicleInfo.key_code;
+    this.kilometers = vehicleInfo.kilometers;
+    //FUEL
+    this.fuelType = vehicleInfo.fuelType;
+    this.fuelConsumption = vehicleInfo.fuelConsumption;
+    this.fuel = vehicleInfo.fuel;
+    //MISC
+    this.brakeOil = vehicleInfo.brakeOil;
+    this.engineOil = vehicleInfo.engineOil;
+    this.engineWater = vehicleInfo.engineWater;
+    this.engineBroke = vehicleInfo.engineBroke;
+    
 }
 
 alt.Player.prototype.saveVehicles = async function saveVehicles() {

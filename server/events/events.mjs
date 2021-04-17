@@ -44,7 +44,6 @@ alt.onClient('vehicle:updateStats', vehicle.updateStats);
 alt.onClient('vehicle:deleteVehicle', vehicle.deleteVehicle);
 alt.onClient('vehicle:goto', vehicle.goto);
 alt.onClient('vehicle:bring', vehicle.bring);
-
 //AUTH
 alt.onClient('auth:getStatus', auth.getStatus);
 alt.onClient('auth:requestRegister', auth.requestRegister);

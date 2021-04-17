@@ -191,7 +191,7 @@ alt.setInterval(() => {
         let fuelConsumptionPer100ms = (fuelTankConsumption / 60 / 60) / 10
         if(native.getIsVehicleEngineRunning(vehicle)) {
             let getRpm = alt.Player.local.vehicle.rpm + 1
-            let getBrakeTense = alt.HandlingData.getForModel(alt.Player.local.vehicle.model).breakForce
+            //let getBrakeTense = alt.HandlingData.getForModel(alt.Player.local.vehicle.model).breakForce
             if(getRpm < 1.4) {
                 getRpm * alt.Player.local.vehicle.rpm
             }
@@ -236,7 +236,6 @@ alt.setInterval(() => {
     engineWater = engineWater - 0.00050;
 }, 100)
 
-let getBrakeTense; 
 alt.setInterval(() => {
     const scriptID = alt.Player.local.scriptID;
     const vehicle = native.getVehiclePedIsIn(scriptID);
@@ -374,13 +373,13 @@ function showUI(vehicleOBJ) {
     });              
 }
 
-export function requestVehicle(vehicleName) {
+export function requestVehicle(vehicleName, temporaryVehicle = true) {
     let vehiclePedIn;
     if(native.isPedInAnyVehicle(alt.Player.local.scriptID, false)) {
         vehiclePedIn = alt.Player.local.vehicle;
     }
     if(native.isModelAVehicle(native.getHashKey(vehicleName))) {
-        alt.emitServer('vehicle:spawnVehicle', vehicleName, vehiclePedIn);
+        alt.emitServer('vehicle:spawnVehicle', vehicleName, vehiclePedIn, temporaryVehicle);
     } else {
         lib.sendlocalmessage('Este veiculo não foi encontrado', 255, 0, 10);
     }
